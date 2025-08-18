@@ -9,9 +9,9 @@ import Alldata from "./Alldata";
 import Link from "next/link";
 
 import { RiBankLine } from "react-icons/ri";
-// react-icons imports
-import { FiPlus, FiDownload, FiFileText, FiCreditCard, FiSettings } from "react-icons/fi";
+import { FiPlus, FiDownload, FiFileText, FiCreditCard } from "react-icons/fi";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion"; // ✅ Added
 
 export default function Navbar() {
   const [payments, setPayments] = useState([]);
@@ -49,10 +49,9 @@ export default function Navbar() {
   const router = useRouter();
 
   const handleEdit = (id) => {
-   setTimeout(()=>{
-     router.push(`/form/${id}`);
-    
-   },30)
+    setTimeout(() => {
+      router.push(`/form/${id}`);
+    }, 30);
   };
 
   const handleDelete = async (id) => {
@@ -99,14 +98,17 @@ export default function Navbar() {
     const lowerSearchTerm = searchTerm.toLowerCase();
 
     const matchesPaymentType =
-      p.paymentType?.some((type) => type.toLowerCase().includes(lowerSearchTerm)) ||
-      false;
+      p.paymentType?.some((type) =>
+        type.toLowerCase().includes(lowerSearchTerm)
+      ) || false;
 
-    const matchesNote = p.note?.toLowerCase().includes(lowerSearchTerm) || false;
+    const matchesNote =
+      p.note?.toLowerCase().includes(lowerSearchTerm) || false;
 
     const paymentDate = new Date(p.createdAt);
     const matchesDate =
-      (!startDate || paymentDate >= startDate) && (!endDate || paymentDate <= endDate);
+      (!startDate || paymentDate >= startDate) &&
+      (!endDate || paymentDate <= endDate);
 
     const hasNoteAndAmount = p.note && p.amount;
 
@@ -171,52 +173,67 @@ export default function Navbar() {
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-[300px] bg-blue-700 text-white flex flex-col p-6 shadow-xl select-none">
-        <h2 className="text-2xl font-extrabold mb-8 tracking-wide border-b border-blue-500 pb-3"> 
-           <span
-            onClick={() => router.push("/")} >
-            Dashboard
-          </span>
-        </h2>
+      <motion.aside
+        initial={{ x: -250, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="w-[300px] bg-white text-gray-800 flex flex-col p-6 shadow-2xl rounded-r-2xl border-r border-gray-200"
+      >
+        <motion.h2
+          whileHover={{ scale: 1.05 }}
+          className="text-2xl font-extrabold mb-8 tracking-wide border-b border-indigo-600 pb-3 cursor-pointer hover:text-indigo-700 transition"
+          onClick={() => router.push("/")}
+        >
+          Dashboard
+        </motion.h2>
+
         <nav className="flex flex-col gap-4 text-lg">
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => setViewType("Regular")}
             className={`px-5 py-3 rounded-lg transition flex items-center gap-3 font-semibold ${
               viewType === "Regular"
-                ? "bg-indigo-900 shadow-lg"
-                : "hover:bg-indigo-700"
+                ? "bg-blue-600 text-white shadow-md"
+                : "hover:bg-indigo-100 text-gray-700"
             }`}
           >
             <FiCreditCard size={18} />
             Regular
-          </button>
+          </motion.button>
 
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => setViewType("Loan")}
             className={`px-5 py-3 rounded-lg transition flex items-center gap-3 font-semibold ${
-              viewType === "Loan" ? "bg-indigo-900 shadow-lg" : "hover:bg-indigo-700"
+              viewType === "Loan"
+                ? "bg-blue-600 text-white shadow-md"
+                : "hover:bg-indigo-100 text-gray-700"
             }`}
           >
             <RiBankLine size={18} />
             Loan
-          </button>
+          </motion.button>
 
-         
-
-         <Link href="/showtable"> <button
-            
-            className="px-5 py-3 rounded-lg hover:bg-indigo-700 transition flex items-center gap-3 font-semibold"
-          >
-            <FiFileText size={20} />
-            Export PDF
-          </button></Link> 
+          <Link href="/showtable">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-5 py-3 rounded-lg hover:bg-indigo-100 transition flex items-center gap-3 font-semibold text-gray-700"
+            >
+              <FiFileText size={20} />
+              Export PDF
+            </motion.button>
+          </Link>
         </nav>
-      </aside>
+      </motion.aside>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
         <header className="bg-white shadow-md p-4 overflow-x-auto whitespace-nowrap flex items-center gap-6 border-b border-gray-300">
+          {/* Search */}
           <div className="flex items-center gap-3">
             <label className="text-sm font-semibold text-gray-700">Search:</label>
             <input
@@ -259,19 +276,19 @@ export default function Navbar() {
           {/* Download Buttons */}
           <button
             onClick={downloadExcel}
-            className="px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md shadow-md text-sm flex items-center gap-2 transition"
+            className="px-5 py-2 bg-white hover:bg-green-600 hover:text-white text-black rounded-md shadow-md text-sm flex items-center gap-2 transition"
           >
             <FiDownload size={20} />
             Excel
           </button>
           <button
             onClick={downloadPDF}
-            className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md shadow-md text-sm flex items-center gap-2 transition"
+            className="px-5 py-2 bg-white hover:bg-red-500 hover:text-white text-black  rounded-md shadow-md text-sm flex items-center gap-2 transition"
           >
             <FiFileText size={20} />
             PDF
           </button>
-          <button className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-md text-sm flex items-center gap-2 transition">
+          <button className="px-5 py-2  bg-white hover:bg-blue-500 hover:text-white text-black rounded-md shadow-md text-sm flex items-center gap-2 transition">
             <FiPlus size={20} />
             <Link href="/form" className="block">
               Add payment

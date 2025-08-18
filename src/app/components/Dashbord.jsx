@@ -3,24 +3,55 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { FaHome, FaUserShield } from "react-icons/fa";
 import {
-  PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,
-  LineChart, Line, XAxis, YAxis, CartesianGrid
+  BarChart,
+  Bar,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  LineChart,
 } from "recharts";
-
-const COLORS2 = ['#ff7043', '#26c6da']; // Loan payments colors
+import { motion } from "framer-motion"; // ✅ Framer Motion
 
 const sidebarStyle = {
-  width: '300px',
-  backgroundColor: '#1E90FF',
-  color: 'white',
-  height: '100vh',
-  padding: '20px',
-  boxSizing: 'border-box',
+  width: "250px",
+  background: "white",
+  color: "#333",
+  height: "100vh",
+  padding: "30px 20px",
+  boxSizing: "border-box",
+  display: "flex",
+  flexDirection: "column",
+  fontFamily: "sans-serif",
+  boxShadow: "6px 0 25px rgba(0,0,0,0.1)",
+  borderRadius: "0 20px 20px 0",
 };
 
-const containerStyle = { display: "flex", height: "100vh" };
-const mainContentStyle = { flex: 1, padding: 20, backgroundColor: "#eef3fb", overflowY: "auto" };
-const graphBoxStyle = { width: "100%", height: 320, background: "white", borderRadius: 16, boxShadow: "0 4px 20px rgba(0,0,0,0.08)", padding: 20, marginBottom: 40 };
+const containerStyle = {
+  display: "flex",
+  height: "100vh",
+  fontFamily: "sans-serif",
+  backgroundColor: "#f8f9fd",
+};
+
+const mainContentStyle = {
+  flex: 1,
+  padding: "30px",
+  overflowY: "auto",
+};
+
+const graphBoxStyle = {
+  width: "100%",
+  height: 320,
+  background: "white",
+  borderRadius: "20px",
+  boxShadow: "0 6px 25px rgba(0,0,0,0.15)",
+  padding: 20,
+  marginBottom: 40,
+};
 
 const sidebarLinks = [
   { name: "Dashboard", path: "/home", icon: <FaHome /> },
@@ -28,7 +59,9 @@ const sidebarLinks = [
 ];
 
 const Dashboard = () => {
-  const [otherPayments, setOtherPayments] = useState([{ name: "Placeholder", value: 0 }]);
+  const [otherPayments, setOtherPayments] = useState([
+    { name: "Placeholder", value: 0 },
+  ]);
   const [loanStatus, setLoanStatus] = useState({ pending: 0, closed: 0 });
 
   const fetchPayments = async () => {
@@ -37,16 +70,15 @@ const Dashboard = () => {
       const data = await res.json();
 
       setLoanStatus({
-        // pending value 1 ने कमी केली (minimum 0 ठेवली)
-        pending: Math.max((data.loan?.pending || 0) -1, 0 ),
+        pending: Math.max((data.loan?.pending || 0) - 1, 0),
         closed: data.loan?.closed || 0,
       });
 
-      const filteredOtherPayments = data.otherPayments.map(item => ({
-  name: Array.isArray(item.paymentType)
-    ? item.paymentType.join(",")
-    : item.paymentType,
-  value: Math.max((item.count || 0) -1,0),
+      const filteredOtherPayments = data.otherPayments.map((item) => ({
+        name: Array.isArray(item.paymentType)
+          ? item.paymentType.join(",")
+          : item.paymentType,
+        value: Math.max((item.count || 0) - 1, 0),
       }));
 
       setOtherPayments(filteredOtherPayments);
@@ -59,86 +91,126 @@ const Dashboard = () => {
     fetchPayments();
   }, []);
 
-  const loanPieData = [
-    { name: "Pending", value: loanStatus.pending },
-    { name: "Closed", value: loanStatus.closed },
-  ];
-
   return (
     <div style={containerStyle}>
       {/* Sidebar */}
-      <aside style={sidebarStyle}>
-        <h1 style={{ marginBottom: '40px' }}>Admin Controller</h1>
+      <motion.aside
+        style={sidebarStyle}
+        initial={{ x: -250, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
+        <h2 style={{ marginBottom: "40px", fontWeight: "bold", color: "#1976d2" }}>
+          White Admin
+        </h2>
         <nav>
           <ul style={{ listStyle: "none", padding: 0 }}>
             {sidebarLinks.map((link, index) => (
-              <li key={index} style={{ marginBottom: 20, cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}>
-                {link.icon}
-                <Link href={link.path} style={{ color: "white", textDecoration: "none" }}>{link.name}</Link>
-              </li>
+              <motion.li
+                key={index}
+                style={{
+                  marginBottom: 20,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  fontSize: "16px",
+                  padding: "10px 15px",
+                  borderRadius: "12px",
+                  transition: "all 0.3s ease",
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  backgroundColor: "#e3f2fd",
+                  color: "#1976d2",
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span style={{ fontSize: "18px" }}>{link.icon}</span>
+                <Link
+                  href={link.path}
+                  style={{ color: "inherit", textDecoration: "none" }}
+                >
+                  {link.name}
+                </Link>
+              </motion.li>
             ))}
           </ul>
         </nav>
-      </aside>
+      </motion.aside>
 
       {/* Main content */}
       <main style={mainContentStyle}>
         {/* Other Payments Line Chart */}
-        <h3 style={{ marginBottom: 16, color: "#1e88e5" }}>Other Payments by Type</h3>
-        <div style={{ ...graphBoxStyle, borderTop: "4px solid #1e88e5" }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={otherPayments}>
-              <defs>
-                <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#42a5f5" stopOpacity={0.8}/>
-                  <stop offset="100%" stopColor="#42a5f5" stopOpacity={0.1}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
-              <XAxis dataKey="name" tick={{ fill: "#555" }} />
-              <YAxis tick={{ fill: "#555" }} />
-              <Tooltip contentStyle={{ borderRadius: 10, borderColor: "#42a5f5" }} />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="url(#colorValue)"
-                strokeWidth={4}
-                dot={{ r: 6, strokeWidth: 2, stroke: "#fff", fill: "#42a5f5" }}
-                activeDot={{ r: 9, fill: "#1e88e5" }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        <motion.div
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.7 }}
+        >
+          <h3 style={{ marginBottom: 16, color: "#1e88e5" }}>
+            Other Payments by Type
+          </h3>
+          <div style={{ ...graphBoxStyle, borderTop: "4px solid #1e88e5" }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={otherPayments}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+                <XAxis dataKey="name" tick={{ fill: "#555" }} />
+                <YAxis tick={{ fill: "#555" }} />
+                <Tooltip contentStyle={{ borderRadius: 10, borderColor: "#42a5f5" }} />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#42a5f5"
+                  strokeWidth={4}
+                  dot={{
+                    r: 6,
+                    strokeWidth: 2,
+                    stroke: "#fff",
+                    fill: "#42a5f5",
+                  }}
+                  activeDot={{ r: 9, fill: "#1e88e5" }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
 
-        {/* Loan Payments Pie Chart */}
+        {/* Loan Payments LineBar Chart */}
         {(loanStatus.pending > 0 || loanStatus.closed > 0) && (
-          <>
-            <h3 style={{ marginBottom: 16, color: "#ef5350" }}>Loan Payments Status</h3>
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <h3 style={{ marginBottom: 16, color: "#ef5350" }}>
+              Loan Payments Status
+            </h3>
             <div style={{ ...graphBoxStyle, borderTop: "4px solid #ef5350" }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={loanPieData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine
-                    label={({ name, value }) => `${name}: ${value}`}
-                    outerRadius={100}
-                    innerRadius={50}
-                    dataKey="value"
-                    isAnimationActive={false}
-                  >
-                    {loanPieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS2[index % COLORS2.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value, name) => [value, name]} />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height="100%">
+  <BarChart
+    data={[{ name: "Loans", ...loanStatus }]}
+    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+    barSize={45} // Fix width
+    barCategoryGap="25%" // ✅ bars मधला space वाढवला
+  >
+    <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+    <XAxis dataKey="name" tick={{ fill: "#555" }} />
+    <YAxis tick={{ fill: "#555" }} />
+    <Tooltip />
+    <Legend />
+    {/* Bars */}
+    <Bar dataKey="pending" fill="#ff7043" radius={[6, 6, 0, 0]} />
+    <Bar dataKey="closed" fill="#26c6da" radius={[6, 6, 0, 0]} />
+    {/* Lines */}
+    <Line type="monotone" dataKey="pending" stroke="#ff7043" strokeWidth={3} />
+    <Line type="monotone" dataKey="closed" stroke="#26c6da" strokeWidth={3} />
+  </BarChart>
+</ResponsiveContainer>
+
+
             </div>
-          </>
+          </motion.div>
         )}
       </main>
     </div>
