@@ -1,26 +1,29 @@
-// models/Payment.js
 import mongoose from "mongoose";
 
 const PaymentSchema = new mongoose.Schema({
-  paymentType: {
-    type: [String], // Array of strings
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",   // relation with User
     
+  },
+  paymentType: {
+    type: [String], // array of payment types
   },
   amount: {
     type: Number,
-
+    
   },
   note: {
     type: String,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
   },
   status: {
     type: String,
     enum: ["Pending", "Closed"],
     default: "Pending",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 

@@ -1,4 +1,4 @@
-import { connectDB } from "../../../lib/dbconect";
+import { connectDB } from "../../../lib/dbConnect";
 import Payment from "../../../models/payment";
 import { NextResponse } from "next/server";
 
@@ -30,3 +30,5 @@ export async function PUT(req, { params }) {
     return NextResponse.json({ error: "Update failed" }, { status: 400 });
   }
 }
+
+

@@ -1,28 +1,79 @@
-import { connectDB } from "../../lib/dbconect";
+import { jwtDecode } from "jwt-decode";
+import { connectDB } from "../../lib/dbConnect";
 import Payment from "../../models/payment";
+import jwt from "jsonwebtoken"
 import { NextResponse } from "next/server";
 
-export async function GET() {
-  await connectDB();
-  const payments = await Payment.find();
-  return NextResponse.json(payments);
+
+export async function GET(req) {
+  try {
+    await connectDB();
+
+    // token काढा
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader) {
+      return NextResponse.json({ error: "No token" }, { status: 401 });
+    }
+
+    const token = authHeader.split(" ")[1];
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
+    // ✅ फक्त त्याच user चे payments
+    const payments = await Payment.find({ user: decoded.id }).sort({ createdAt: -1 });
+
+    return NextResponse.json(payments);
+  } catch (error) {
+    console.error("GET /api/payments error:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
 }
 
 
 export async function POST(req) {
   await connectDB();
 
-  const body = await req.json();
+  try {
 
-  // PaymentType format: first letter uppercase, rest lowercase
-  if (body.paymentType) {
-    const type = body.paymentType;
-    body.paymentType = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+    const body = await req.json();
+    const { paymentType, amount, note, status, userId } = body;
+     console.log(userId)
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Amount and userId are required" },
+        { status: 400 }
+      );
+    }
+
+    // Format paymentType
+    let formattedType = paymentType;
+    if (paymentType) {
+      formattedType =
+        paymentType.charAt(0).toUpperCase() + paymentType.slice(1).toLowerCase();
+    }
+
+    const payment = await Payment.create({
+      paymentType: formattedType,
+      amount,
+      note,
+      status,
+      user: userId, // ✅ Schema मधल्या "user" field ला assign
+    });
+
+    return NextResponse.json(payment, { status: 201 });
+  } catch (error) {
+    console.error("Payment error:", error);
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    );
   }
-
-  const payment = await Payment.insertMany(body);
-  return NextResponse.json(payment);
 }
+
 
 
 export async function PUT(req) {

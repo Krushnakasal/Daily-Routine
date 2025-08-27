@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 
@@ -8,7 +9,15 @@ export default function FileTableViewer() {
   const [file, setFile] = useState(null);
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const router = useRouter();
+  useEffect(() => {
+      const token = localStorage.getItem("token");
+  
+      if (!token) {
+        router.push("/"); // ❌ Token नाही → redirect
+        return;
+      }
+  },[])
   // Load PDF.js dynamically
   useEffect(() => {
     (async () => {

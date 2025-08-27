@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation"; // ✅ redirect साठी
 import Link from "next/link";
 import { FaHome, FaUserShield } from "react-icons/fa";
 import {
@@ -59,10 +60,24 @@ const sidebarLinks = [
 ];
 
 const Dashboard = () => {
+  const router = useRouter();
+  const [isAuth, setIsAuth] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [otherPayments, setOtherPayments] = useState([
     { name: "Placeholder", value: 0 },
   ]);
   const [loanStatus, setLoanStatus] = useState({ pending: 0, closed: 0 });
+
+  // ✅ Token check
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/"); // token नसेल तर redirect
+    } else {
+      setIsAuth(true);
+    }
+    setLoading(false);
+  }, [router]);
 
   const fetchPayments = async () => {
     try {
@@ -88,8 +103,14 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    fetchPayments();
-  }, []);
+    if (isAuth) {
+      fetchPayments();
+    }
+  }, [isAuth]);
+
+  if (loading) return <div>Loading...</div>;
+
+  if (!isAuth) return null; // ❌ token नसेल तर component renderच होणार नाही
 
   return (
     <div style={containerStyle}>
@@ -187,28 +208,24 @@ const Dashboard = () => {
               Loan Payments Status
             </h3>
             <div style={{ ...graphBoxStyle, borderTop: "4px solid #ef5350" }}>
-            <ResponsiveContainer width="100%" height="100%">
-  <BarChart
-    data={[{ name: "Loans", ...loanStatus }]}
-    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-    barSize={45} // Fix width
-    barCategoryGap="25%" // ✅ bars मधला space वाढवला
-  >
-    <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
-    <XAxis dataKey="name" tick={{ fill: "#555" }} />
-    <YAxis tick={{ fill: "#555" }} />
-    <Tooltip />
-    <Legend />
-    {/* Bars */}
-    <Bar dataKey="pending" fill="#ff7043" radius={[6, 6, 0, 0]} />
-    <Bar dataKey="closed" fill="#26c6da" radius={[6, 6, 0, 0]} />
-    {/* Lines */}
-    <Line type="monotone" dataKey="pending" stroke="#ff7043" strokeWidth={3} />
-    <Line type="monotone" dataKey="closed" stroke="#26c6da" strokeWidth={3} />
-  </BarChart>
-</ResponsiveContainer>
-
-
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={[{ name: "Loans", ...loanStatus }]}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  barSize={45}
+                  barCategoryGap="25%"
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+                  <XAxis dataKey="name" tick={{ fill: "#555" }} />
+                  <YAxis tick={{ fill: "#555" }} />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="pending" fill="#ff7043" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="closed" fill="#26c6da" radius={[6, 6, 0, 0]} />
+                  <Line type="monotone" dataKey="pending" stroke="#ff7043" strokeWidth={3} />
+                  <Line type="monotone" dataKey="closed" stroke="#26c6da" strokeWidth={3} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </motion.div>
         )}

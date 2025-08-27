@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import {jwtDecode}  from "jwt-decode";
 
 const AdminContoll = () => {
   const [loading, setLoading] = useState(false);
@@ -18,7 +19,14 @@ const AdminContoll = () => {
       paymentType: "",
     },
   });
+useEffect(() => {
+    const token = localStorage.getItem("token");
 
+    if (!token) {
+      router.push("/"); // ❌ Token नाही → redirect
+      return;
+    }
+},[])
   const onSubmit = async (data) => {
     if (!data.paymentType.trim()) {
       return;
@@ -31,16 +39,23 @@ const AdminContoll = () => {
     setLoading(true);
 
     try {
+      const token = localStorage.getItem("token");
+   let userId = null;
+
+if (token) {
+  const decoded = jwtDecode(token);
+  userId = decoded.id;   // ✅ JWT payload मधून id मिळाला
+}
       const res = await fetch("/api/payments", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ paymentType: formattedPaymentType }),
+       headers: { Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ paymentType: formattedPaymentType,userId }),
       });
 
       if (res.ok) {
         alert("Payment method added successfully");
         reset();
-        router.push("/");
+        router.push("/new");
       } else {
         alert("Failed to add payment method");
       }

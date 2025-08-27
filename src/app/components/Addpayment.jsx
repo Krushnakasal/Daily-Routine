@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { jwtDecode } from "jwt-decode";
 
 const Addpayment = ({ id }) => {
   const [paymentTypes, setPaymentTypes] = useState([]);
@@ -14,7 +15,6 @@ const Addpayment = ({ id }) => {
     register,
     handleSubmit,
     setValue,
-    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -24,35 +24,36 @@ const Addpayment = ({ id }) => {
     },
   });
 
-  const formDataWatch = watch();
-
+  // ✅ Token check (unauthorized -> redirect)
   useEffect(() => {
-    const fetchPaymentTypes = async () => {
-      setLoading(true);
-      const res = await fetch("/api/payments");
-      const data = await res.json();
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/");
+    }
+  }, [router]);
 
-      const allTypes = data.flatMap((p) =>
-        Array.isArray(p.paymentType) ? p.paymentType : [p.paymentType]
-      );
-      const uniqueTypes = Array.from(new Set(allTypes));
-      setPaymentTypes(uniqueTypes);
-      setLoading(false);
-    };
-
-    fetchPaymentTypes();
-
+  // ✅ Fetch existing payment if editing
+  useEffect(() => {
     if (id) {
       const fetchPayment = async () => {
         setLoading(true);
-        const res = await fetch(`/api/payments/${id}`);
+        const token = localStorage.getItem("token");
+        const res = await fetch(`/api/payments/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         if (res.ok) {
           const payment = await res.json();
           setValue("paymentType", payment.paymentType);
           setValue("amount", payment.amount);
           setValue("note", payment.note || "");
           setIsEditing(true);
+        } else {
+          console.error("Failed to fetch payment:", res.status);
         }
+
         setLoading(false);
       };
 
@@ -60,24 +61,79 @@ const Addpayment = ({ id }) => {
     }
   }, [id, setValue]);
 
+  // ✅ Fetch all unique paymentTypes for logged-in user
+  useEffect(() => {
+    const fetchPaymentTypes = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("/api/payments", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.ok) {
+          const payments = await res.json();
+
+          // ✅ unique + cleaned types
+          const uniqueTypes = [
+            ...new Set(
+              (payments || [])
+                .flatMap((p) => p.paymentType) // array आतली values काढतो
+                .filter((t) => typeof t === "string" && t.trim() !== "") // फक्त योग्य string
+                .map((t) => t.trim())
+            ),
+          ];
+          setPaymentTypes(uniqueTypes);
+        } else {
+          setPaymentTypes([]);
+        }
+      } catch (err) {
+        console.error("Error fetching payment types:", err);
+        setPaymentTypes([]);
+      }
+    };
+
+    fetchPaymentTypes();
+  }, []);
+
+  // ✅ Helper for capitalizing
+  const capitalize = (str) =>
+    str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+  // ✅ Submit handler
   const onSubmit = async (data) => {
+    const token = localStorage.getItem("token");
+    let userId = null;
+
+    if (token) {
+      const decoded = jwtDecode(token);
+      userId = decoded.id;
+    }
+
     if (isEditing) {
       await fetch(`/api/payments/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ ...data, userId }),
       });
       alert("Payment updated");
-      router.push(`/home`);
     } else {
       await fetch("/api/payments", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ ...data, userId }),
       });
       alert("Payment added");
-      router.push(`/home`);
     }
+
+    router.push(`/home`);
   };
 
   if (loading) return <div>Loading...</div>;
@@ -92,7 +148,9 @@ const Addpayment = ({ id }) => {
         {/* Payment Type */}
         <div>
           <select
-            {...register("paymentType", { required: "Payment Type is required" })}
+            {...register("paymentType", {
+              required: "Payment Type is required",
+            })}
             className={`w-full px-4 py-3 border rounded ${
               errors.paymentType ? "border-red-500" : "border-gray-300"
             }`}
@@ -100,12 +158,14 @@ const Addpayment = ({ id }) => {
             <option value="">Select Payment Type</option>
             {paymentTypes.map((type, i) => (
               <option key={i} value={type}>
-                {type}
+                {capitalize(type)}
               </option>
             ))}
           </select>
           {errors.paymentType && (
-            <span className="text-red-500 text-sm">{errors.paymentType.message}</span>
+            <span className="text-red-500 text-sm">
+              {errors.paymentType.message}
+            </span>
           )}
         </div>
 
@@ -125,7 +185,11 @@ const Addpayment = ({ id }) => {
               errors.amount ? "border-red-500" : "border-gray-300"
             }`}
           />
-          {errors.amount && <span className="text-red-500 text-sm">{errors.amount.message}</span>}
+          {errors.amount && (
+            <span className="text-red-500 text-sm">
+              {errors.amount.message}
+            </span>
+          )}
         </div>
 
         {/* Note */}
@@ -133,14 +197,19 @@ const Addpayment = ({ id }) => {
           <textarea
             placeholder="Note (optional, max 250 chars)"
             {...register("note", {
-              maxLength: { value: 250, message: "Note cannot exceed 250 characters" },
+              maxLength: {
+                value: 250,
+                message: "Note cannot exceed 250 characters",
+              },
             })}
             className={`w-full px-4 py-3 border rounded ${
               errors.note ? "border-red-500" : "border-gray-300"
             }`}
             rows={4}
           />
-          {errors.note && <span className="text-red-500 text-sm">{errors.note.message}</span>}
+          {errors.note && (
+            <span className="text-red-500 text-sm">{errors.note.message}</span>
+          )}
         </div>
 
         <button

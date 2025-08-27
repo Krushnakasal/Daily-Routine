@@ -1,4 +1,4 @@
-import { connectDB } from "../../../../lib/dbconect";
+import { connectDB } from "../../../../lib/dbConnect";
 import Payment from "../../../../models/payment";
 import { NextResponse } from "next/server";
 
