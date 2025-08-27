@@ -276,7 +276,7 @@ export default function Navbar() {
           {openMenu === "admin" && (
             <div className="ml-6 mt-2 flex flex-col gap-2">
               <Link
-                href="/form"
+                href="/admin"
                 className="px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-100"
               >
                 <FiPlus size={16} /> Form
