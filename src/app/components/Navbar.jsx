@@ -41,9 +41,10 @@ export default function Navbar() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (!token) {
-      router.push("/");
+    setTimeout(()=>{
+       router.push("/new");
+    },999)
       return;
     }
 
