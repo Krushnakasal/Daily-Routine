@@ -225,7 +225,7 @@ export default function Navbar() {
           <button onClick={handleAddPayment} className="px-5 py-2 bg-white hover:bg-blue-500 hover:text-white text-black rounded-md shadow-md text-sm flex items-center gap-2 transition"><FiPlus size={20} /> Add payment</button>
         </header>
 
-        <main className="flex-1 p-8 bg-white shadow-inner rounded-md m-6">
+        <main className="flex-1 p-8 bg-white ">
           <Alldata
             currentPayments={currentPayments}
             indexOfFirst={indexOfFirst}
