@@ -178,7 +178,7 @@ export default function Navbar() {
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <motion.aside initial={{ x: -250, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.6, ease: "easeOut" }} className="w-[280px] bg-white text-gray-800 flex flex-col p-6 shadow-2xl rounded-r-2xl border-r border-gray-200">
+      <motion.aside initial={{ x: -250, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.6, ease: "easeOut" }} className="w-[280px] bg-white text-gray-800 flex flex-col p-6 shadow-2xl  border-r border-gray-200">
         <div>
           <button onClick={() => toggleMenu("dashboard")} className="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-200 transition">
             <span className="flex items-center gap-2 font-bold text-lg"><FiFileText size={18} /> Dashboard</span>
