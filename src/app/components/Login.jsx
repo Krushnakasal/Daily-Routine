@@ -24,12 +24,12 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900 p-4 transition-colors duration-300">
       {/* Main Card */}
-      <div className="flex flex-col md:flex-row w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div className="flex flex-col md:flex-row w-full max-w-3xl bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden transition-colors duration-300">
         
         {/* Left Image */}
-        <div className="w-full md:w-1/2 h-48 md:h-auto">
+        <div className="w-full md:w-1/2 h-40 sm:h-56 md:h-auto">
           <img
             src="https://plus.unsplash.com/premium_photo-1681987447977-5fed5b3caefa?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0"
             alt="Daily Routine"
@@ -45,7 +45,7 @@ export default function LoginForm() {
             transition={{ duration: 0.5 }}
             className="w-full max-w-sm"
           >
-            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center text-gray-800 dark:text-gray-100">
               Login
             </h2>
 
@@ -53,13 +53,13 @@ export default function LoginForm() {
               <input
                 {...register("username", { required: true })}
                 placeholder="Username"
-                className="w-full border-b-2 border-gray-300 focus:border-blue-600 outline-none p-2 transition"
+                className="w-full border-b-2 border-gray-300 dark:border-gray-600 focus:border-blue-600 outline-none p-2 transition bg-transparent text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               />
               <input
                 {...register("password", { required: true })}
                 type="password"
                 placeholder="Password"
-                className="w-full border-b-2 border-gray-300 focus:border-blue-600 outline-none p-2 transition"
+                className="w-full border-b-2 border-gray-300 dark:border-gray-600 focus:border-blue-600 outline-none p-2 transition bg-transparent text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               />
               <button
                 type="submit"
