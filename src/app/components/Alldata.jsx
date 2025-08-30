@@ -176,7 +176,7 @@ export default function Alldata({
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      onClick={() => handleDelete(p._id)}
+                      onClick={() => handleDelete(p._id ,i)}
                       className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md font-semibold transition flex items-center gap-1 shadow"
                     >
                       <FiTrash2 size={16} />

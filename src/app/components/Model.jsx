@@ -174,12 +174,13 @@ export default function Navbar() {
   };
 
   // Payment Actions
-  const handleDelete = async (id) => {
-    if (confirm("Are you sure you want to delete this payment?")) {
-      await fetch(`/api/payments?id=${id}`, { method: "DELETE" });
-      fetchPayments();
-    }
-  };
+  const handleDelete = async (id, index) => {
+  if (confirm(`Are you sure you want to delete payment list no = ${index + 1}?`)) {
+    await fetch(`/api/payments?id=${id}`, { method: "DELETE" });
+    fetchPayments();
+  }
+};
+
 
   const handleCloseLoan = async (id) => {
     try {

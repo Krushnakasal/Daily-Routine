@@ -23,7 +23,7 @@ useEffect(() => {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      router.push("/home"); // ❌ Token नाही → redirect
+      router.push("/"); // ❌ Token नाही → redirect
       return;
     }
 },[])
@@ -55,7 +55,7 @@ if (token) {
       if (res.ok) {
         alert("Payment method added successfully");
         reset();
-        router.push("/new");
+        router.push("/home");
       } else {
         alert("Failed to add payment method");
       }
