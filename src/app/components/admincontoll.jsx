@@ -23,7 +23,7 @@ useEffect(() => {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      router.push("/"); // ❌ Token नाही → redirect
+      router.push("/home"); // ❌ Token नाही → redirect
       return;
     }
 },[])
