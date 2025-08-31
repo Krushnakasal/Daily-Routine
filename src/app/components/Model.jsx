@@ -319,7 +319,7 @@ export default function Navbar() {
                 >
                   <button 
                     onClick={() => setViewType("Regular")} 
-                    onClick={closeSidebar}
+                   
                     className={`px-4 py-2 rounded flex items-center gap-2 transition ${
                       viewType === "Regular" 
                         ? "bg-blue-600 text-white" 
@@ -330,7 +330,6 @@ export default function Navbar() {
                   </button>
                   <button 
                     onClick={() => setViewType("Loan")  } 
-                    onClick={closeSidebar}
                     className={`px-4 py-2 rounded flex items-center gap-2 transition ${
                       viewType === "Loan" 
                         ? "bg-blue-600 text-white" 
@@ -341,7 +340,7 @@ export default function Navbar() {
                   </button>
                   <Link 
                     href="/showtable" 
-                    onClick={closeSidebar}
+                   
                     className={`px-4 py-2 rounded flex items-center gap-2 transition ${
                       isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
                     }`}
