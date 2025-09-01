@@ -476,7 +476,7 @@ export default function Navbar() {
                     }`}
                   >
                     <FiCreditCard size={16} /> 
-                    <span>Regular Payments</span>
+                    <span onClick={closeSidebar}>Regular Payments</span>
                     {viewType === "Regular" && <div className="ml-auto w-2 h-2 bg-white rounded-full"></div>}
                   </button>
                   
@@ -489,11 +489,11 @@ export default function Navbar() {
                     }`}
                   >
                     <RiBankLine size={16} /> 
-                    <span>Loan Payments</span>
+                    <span onClick={closeSidebar}>Loan Payments</span>
                     {viewType === "Loan" && <div className="ml-auto w-2 h-2 bg-white rounded-full"></div>}
                   </button>
                   
-                  <Link 
+                  {/* <Link 
                     href="/showtable" 
                     className={`w-full px-4 py-3 rounded-lg flex items-center gap-3 transition-all ${
                       isDark ? 'hover:bg-gray-700/50' : 'hover:bg-white/50'
@@ -501,7 +501,7 @@ export default function Navbar() {
                   >
                     <FiFileText size={16} /> 
                     <span>Export Reports</span>
-                  </Link>
+                  </Link> */}
                 </motion.div>
               )}
             </AnimatePresence>
