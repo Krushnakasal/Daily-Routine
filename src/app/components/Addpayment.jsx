@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { jwtDecode } from "jwt-decode";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Addpayment = ({ id }) => {
   const [paymentTypes, setPaymentTypes] = useState([]);
@@ -79,8 +81,8 @@ const Addpayment = ({ id }) => {
           const uniqueTypes = [
             ...new Set(
               (payments || [])
-                .flatMap((p) => p.paymentType) // array आतली values काढतो
-                .filter((t) => typeof t === "string" && t.trim() !== "") // फक्त योग्य string
+                .flatMap((p) => p.paymentType)
+                .filter((t) => typeof t === "string" && t.trim() !== "")
                 .map((t) => t.trim())
             ),
           ];
@@ -111,29 +113,35 @@ const Addpayment = ({ id }) => {
       userId = decoded.id;
     }
 
-    if (isEditing) {
-      await fetch(`/api/payments/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ ...data, userId }),
-      });
-      alert("Payment updated");
-    } else {
-      await fetch("/api/payments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ ...data, userId }),
-      });
-      alert("Payment added");
-    }
+    try {
+      if (isEditing) {
+        await fetch(`/api/payments/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ ...data, userId }),
+        });
+        toast.success("✅ Payment updated successfully");
+      } else {
+        await fetch("/api/payments", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ ...data, userId }),
+        });
+        toast.success("✅ Payment added successfully");
+      }
 
-    router.push(`/home`);
+      setTimeout(() => {
+        router.push(`/home`);
+      }, 1200);
+    } catch (err) {
+      toast.error("❌ Something went wrong!");
+    }
   };
 
   if (loading) return <div>Loading...</div>;
@@ -219,6 +227,9 @@ const Addpayment = ({ id }) => {
           {isEditing ? "Update" : "Submit"}
         </button>
       </form>
+
+      {/* Toastify container */}
+      <ToastContainer position="top-right" autoClose={2500} />
     </div>
   );
 };

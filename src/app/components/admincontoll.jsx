@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { jwtDecode } from "jwt-decode";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AdminContoll = () => {
   const [loading, setLoading] = useState(false);
@@ -23,7 +25,7 @@ const AdminContoll = () => {
   });
 
   // 🔧 helpers
-  const str = (v) => String(v ?? ""); // null/undefined safe
+  const str = (v) => String(v ?? "");
   const normalizeForCompare = (v) =>
     str(v).toLowerCase().replace(/\s+/g, "").trim();
   const normalizeHuman = (v) => {
@@ -32,7 +34,7 @@ const AdminContoll = () => {
     return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
   };
 
-  // 🔹 fetch + filter (paymentType && status असलेले + note नसलेले)
+  // 🔹 fetch + filter
   const fetchPayments = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -47,23 +49,23 @@ const AdminContoll = () => {
 
       // ✅ फक्त paymentType + status असलेले आणि note === null असलेले
       const filtered = data.filter(
-  (p) =>
-    p.paymentType &&              // null/"" नको
-    p.status === "Pending" &&     // फक्त Pending
-    (p.note === null || p.note === undefined) // note नसलेले
-);
-
+        (p) =>
+          p.paymentType &&
+          p.status === "Pending" &&
+          (p.note === null || p.note === undefined)
+      );
 
       setPayments(filtered);
     } catch (err) {
       console.error("Error fetching payments:", err);
+      toast.error("Error fetching payments");
     }
   };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      router.push("/"); // ❌ Token नाही → redirect
+      router.push("/");
       return;
     }
     fetchPayments();
@@ -76,13 +78,12 @@ const AdminContoll = () => {
 
     const formattedPaymentType = normalizeHuman(raw);
 
-    // ✅ Duplicate check
     const newKey = normalizeForCompare(formattedPaymentType);
     const exists = allPayments.some(
       (p) => normalizeForCompare(p.paymentType) === newKey && p._id !== editId
     );
     if (exists) {
-      alert("This payment method already exists!");
+      toast.error("This payment method already exists!");
       return;
     }
 
@@ -111,15 +112,15 @@ const AdminContoll = () => {
       });
 
       if (res.ok) {
-        alert(editId ? "Payment method updated" : "Payment method added");
+        toast.success(editId ? "Payment method updated" : "Payment method added");
         reset();
         setEditId(null);
         await fetchPayments();
       } else {
-        alert("Failed to save payment method");
+        toast.error("Failed to save payment method");
       }
     } catch (error) {
-      alert("Error: " + error.message);
+      toast.error("Error: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -133,7 +134,7 @@ const AdminContoll = () => {
 
   // 🔹 Delete handler
   const handleDelete = async (id, index) => {
-    if (!confirm(`Are you sure you want to delete payment #${index + 1}?`)) return;
+    if (!confirm(`Are you sure you want to delete payment ${index + 1}?`)) return;
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(`/api/payments?id=${id}`, {
@@ -142,18 +143,20 @@ const AdminContoll = () => {
       });
 
       if (res.ok) {
-        alert("Payment deleted");
+        toast.success("Payment deleted");
         await fetchPayments();
       } else {
-        alert("Failed to delete");
+        toast.error("Failed to delete");
       }
     } catch (err) {
       console.error("Delete error:", err);
+      toast.error("Error deleting payment");
     }
   };
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
+      <ToastContainer position="top-right" autoClose={3000} />
       <h2 className="text-2xl font-bold mb-4 text-indigo-700 text-center">
         {editId ? "Edit Payment Method" : "Add Payment Method"}
       </h2>
@@ -173,7 +176,9 @@ const AdminContoll = () => {
           disabled={loading}
         />
         {errors.paymentType && (
-          <span className="text-red-500 text-sm">{errors.paymentType.message}</span>
+          <span className="text-red-500 text-sm">
+            {errors.paymentType.message}
+          </span>
         )}
 
         <button
@@ -191,9 +196,11 @@ const AdminContoll = () => {
         </button>
       </form>
 
-      {/* List (paymentType + status असलेले && note === null) */}
+      {/* List */}
       <div className="mt-6">
-        <h3 className="text-lg font-semibold mb-2 text-gray-700">Payment Methods</h3>
+        <h3 className="text-lg font-semibold mb-2 text-gray-700">
+          Payment Methods
+        </h3>
         {payments.length === 0 ? (
           <p className="text-gray-500">No payment methods found</p>
         ) : (
@@ -205,8 +212,9 @@ const AdminContoll = () => {
                   className="flex justify-between items-center bg-gray-100 p-3 rounded"
                 >
                   <div>
-                    <span className="font-medium">{str(p.paymentType).trim()}</span>
-                   
+                    <span className="font-medium">
+                      {str(p.paymentType).trim()}
+                    </span>
                   </div>
                   <div className="space-x-2">
                     <button

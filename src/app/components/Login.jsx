@@ -1,13 +1,24 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function LoginForm() {
   const router = useRouter();
   const { register, handleSubmit } = useForm();
+
+  useEffect(() => {
+    const Token = localStorage.getItem("token");
+    if (Token) {
+      setTimeout(() => {
+        router.push("/home");
+      }, 111);
+    }
+  }, []);
 
   const onSubmit = async (data) => {
     try {
@@ -15,19 +26,22 @@ export default function LoginForm() {
 
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
+        toast.success("Login successful!", { position: "top-right" });
         router.push("/home");
       }
     } catch (err) {
       console.error(err);
-      alert("Login failed");
+      toast.error("Login failed. Please try again!", { position: "top-right" });
     }
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900 p-4 transition-colors duration-300">
+      {/* Toast Container */}
+      <ToastContainer />
+
       {/* Main Card */}
       <div className="flex flex-col md:flex-row w-full max-w-3xl bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden transition-colors duration-300">
-        
         {/* Left Image */}
         <div className="w-full md:w-1/2 h-40 sm:h-56 md:h-auto">
           <img
