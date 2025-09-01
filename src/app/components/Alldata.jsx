@@ -2,8 +2,7 @@ import { FiEdit, FiTrash2, FiX, FiCheck, FiClock } from "react-icons/fi";
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+
 
 export default function Alldata({
   currentPayments,
@@ -33,9 +32,9 @@ export default function Alldata({
     text?.length > length ? text.slice(0, length) + "..." : text;
 
   // Toast wrappers
-  const notifyDelete = () => toast.success("Payment deleted successfully ✅");
-  const notifyEdit = () => toast.info("Edit mode opened ✏️");
-  const notifyCloseLoan = () => toast.success("Loan closed successfully 🚀");
+  //const notifyDelete = () => toast.success("Payment deleted successfully ✅");
+ // const notifyEdit = () => toast.info("Edit mode opened ✏️");
+  //const notifyCloseLoan = () => toast.success("Loan closed successfully 🚀");
 
   return (
     <>
@@ -185,7 +184,7 @@ export default function Alldata({
                     whileTap={{ scale: 0.95 }}
                     onClick={() => {
                       handleEdit(p._id);
-                      notifyEdit();
+                     
                     }}
                     className="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 px-3 py-2 rounded-md font-semibold transition flex items-center gap-2 shadow-sm"
                   >
@@ -197,7 +196,7 @@ export default function Alldata({
                     whileTap={{ scale: 0.95 }}
                     onClick={() => {
                       handleDelete(p._id, i);
-                      notifyDelete();
+                    
                     }}
                     className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md font-semibold transition flex items-center gap-2 shadow-sm"
                   >
@@ -351,7 +350,7 @@ export default function Alldata({
                           <button
                             onClick={() => {
                               handleCloseLoan(p._id);
-                              notifyCloseLoan();
+                              
                             }}
                             className="flex items-center justify-center p-2 ml-8 bg-red-500 text-white rounded-full hover:bg-red-600 transition"
                             title="Close Loan"
@@ -385,7 +384,7 @@ export default function Alldata({
                         whileTap={{ scale: 0.9 }}
                         onClick={() => {
                           handleEdit(p._id);
-                          notifyEdit();
+                         
                         }}
                         className="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 px-2 lg:px-3 py-1 lg:py-2 rounded-md font-semibold transition flex items-center gap-1 lg:gap-2 shadow"
                       >
@@ -397,7 +396,7 @@ export default function Alldata({
                         whileTap={{ scale: 0.9 }}
                         onClick={() => {
                           handleDelete(p._id, i);
-                          notifyDelete();
+                          
                         }}
                         className="bg-red-500 hover:bg-red-600 text-white px-2 lg:px-3 py-1 lg:py-2 rounded-md font-semibold transition flex items-center gap-1 lg:gap-2 shadow"
                       >
