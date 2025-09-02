@@ -65,7 +65,7 @@ const AdminContoll = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      router.push("/");
+      router.push("/hew");
       return;
     }
     fetchPayments();
@@ -125,6 +125,7 @@ const AdminContoll = () => {
       setLoading(false);
     }
   };
+
 
   // 🔹 Edit handler
   const handleEdit = (payment) => {

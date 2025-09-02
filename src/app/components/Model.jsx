@@ -628,7 +628,7 @@ export default function Navbar() {
             <FiMenu size={24} />
           </button>
           <h1 className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-800'}`}>
-            Payment Dashboard
+          <span>{viewType}</span>  Payment Dashboard
           </h1>
           <button
             onClick={toggleDarkMode}
